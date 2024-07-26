@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('holder_name');
             $table->string('type_of_insurance');
             $table->decimal('coverage_amount', total: 20, places: 2);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
