@@ -3,14 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\InsurancePolicy;
+use App\Classes\ApiResponseClass;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Resources\InsurancePolicyResource;
+use App\Http\Requests\StoreInsurancePolicyRequest;
+use App\Http\Requests\UpdateInsurancePolicyRequest;
+use App\Interfaces\InsurancePolicyRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 
 class InsurancePolicyController extends Controller implements HasMiddleware
 {
+
+    private InsurancePolicyRepositoryInterface $insurancePolicyRepositoryInterface;
+    
+    public function __construct(InsurancePolicyRepositoryInterface $insurancePolicyRepositoryInterface)
+    {
+        $this->insurancePolicyRepositoryInterface = $insurancePolicyRepositoryInterface;
+    }
+
     public static function middleware()
     {
         return [
@@ -23,51 +36,87 @@ class InsurancePolicyController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return InsurancePolicy::all();
+        // return InsurancePolicy::all();
+        $data = $this->insurancePolicyRepositoryInterface->index();
+        
+        return ApiResponseClass::sendResponse(InsurancePolicyResource::collection($data),null,200);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreInsurancePolicyRequest $request)
     {
-        $fields = $request->validate([
-            'policy_number' => 'required|max:255',
-            'holder_name' => 'required|max:255',
-            'type_of_insurance' => 'required|max:255',
-            'coverage_amount' => 'required|max:255',
-        ]);
+        $user = $request->user();
 
-        $insurancePolicy = $request->user()->insurancePolicies()->create($fields);
+        $details = [
+            'policy_number' => $request->policy_number,
+            'holder_name' => $request->holder_name,
+            'type_of_insurance' => $request->type_of_insurance,
+            'coverage_amount' => $request->coverage_amount,
+        ];
 
-        return $insurancePolicy;
+        DB::beginTransaction();
+
+        try{
+            $insurancePolicy = $this->insurancePolicyRepositoryInterface->store($details, $user);
+
+            // $insurancePolicy = $request->user()->insurancePolicies()->create($fields);
+
+            DB::commit();
+            return ApiResponseClass::sendResponse(new InsurancePolicyResource($insurancePolicy),'Inusrance Policy Create Successful',201);
+
+       }catch(\Exception $ex){
+           return ApiResponseClass::rollback($ex);
+       }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(InsurancePolicy $insurancePolicy)
+    public function show($id)
     {
-        return $insurancePolicy;
+        $insurancePolicy = $this->insurancePolicyRepositoryInterface->getById($id);
+    
+        return ApiResponseClass::sendResponse(new InsurancePolicyResource($insurancePolicy),null,200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, InsurancePolicy $insurancePolicy)
+    public function update(UpdateInsurancePolicyRequest $request, $id)
     {
-        Gate::authorize('modify', $insurancePolicy);
+        Gate::authorize('modify', $this->insurancePolicyRepositoryInterface->getById($id));
+
+        $updateDetails = [
+            'policy_number' => $request->policy_number,
+            'holder_name' => $request->holder_name,
+            'type_of_insurance' => $request->type_of_insurance,
+            'coverage_amount' => $request->coverage_amount,
+        ];
+
+        DB::beginTransaction();
+
+        try{
+            $insurancePolicy = $this->insurancePolicyRepositoryInterface->update($updateDetails, $id);
+
+            DB::commit();
+            return ApiResponseClass::sendResponse(null,'Insurance Policy Update Successful',201);
+
+       }catch(\Exception $ex){
+           return ApiResponseClass::rollback($ex);
+       }
         
-        $fields = $request->validate([
-            'policy_number' => 'required|max:255',
-            'holder_name' => 'required|max:255',
-            'type_of_insurance' => 'required|max:255',
-            'coverage_amount' => 'required|max:255',
-        ]);
+        // $fields = $request->validate([
+        //     'policy_number' => 'required|max:255',
+        //     'holder_name' => 'required|max:255',
+        //     'type_of_insurance' => 'required|max:255',
+        //     'coverage_amount' => 'required|max:255',
+        // ]);
 
-        $insurancePolicy->update($fields);
+        // $insurancePolicy->update($fields);
 
-        return $insurancePolicy;
+        // return $insurancePolicy;
     }
 
     /**
@@ -77,8 +126,8 @@ class InsurancePolicyController extends Controller implements HasMiddleware
     {
         Gate::authorize('modify', $insurancePolicy);
 
-        $insurancePolicy->delete();
+        $this->insurancePolicyRepositoryInterface->delete($insurancePolicy->id);
 
-        return ['message' => 'The policy was deleted'];
+        return ApiResponseClass::sendResponse(null,'Product Delete Successfully',200);
     }
 }

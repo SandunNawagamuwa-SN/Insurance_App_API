@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+// use App\Enums\InsuranceType;
+// use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreInsurancePolicyRequest extends FormRequest
 {
@@ -11,7 +15,7 @@ class StoreInsurancePolicyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +26,19 @@ class StoreInsurancePolicyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'policy_number' => 'required|min:8|max:255|unique:insurance_policies',
+            'holder_name' => 'required|min:6|max:255',
+            'type_of_insurance' => 'required|max:255|in:TERM,WHOLE,UNIVERSAL',
+            'coverage_amount' => 'required|max:255'
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Validation errors',
+            'data'    => $validator->errors()
+        ]));
     }
 }

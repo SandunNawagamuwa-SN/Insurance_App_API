@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->unsigned()->nullable();
             $table->string('policy_number');
             $table->string('holder_name');
-            $table->string('type_of_insurance');
+            $table->enum('type_of_insurance', ['TERM', 'WHOLE', 'UNIVERSAL']);
             $table->decimal('coverage_amount', total: 20, places: 2);
             $table->softDeletes();
             $table->timestamps();
