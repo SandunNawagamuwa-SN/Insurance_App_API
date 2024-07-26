@@ -16,4 +16,9 @@ class InsurancePolicy extends Model
         'type_of_insurance',
         'coverage_amount'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

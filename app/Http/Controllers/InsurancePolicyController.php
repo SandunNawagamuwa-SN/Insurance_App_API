@@ -5,9 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\InsurancePolicy;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
-class InsurancePolicyController extends Controller
+class InsurancePolicyController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum', except: ['index', 'show'])
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +38,7 @@ class InsurancePolicyController extends Controller
             'coverage_amount' => 'required|max:255',
         ]);
 
-        $insurancePolicy = InsurancePolicy::create($fields);
+        $insurancePolicy = $request->user()->insurancePolicies()->create($fields);
 
         return $insurancePolicy;
     }
@@ -46,6 +56,8 @@ class InsurancePolicyController extends Controller
      */
     public function update(Request $request, InsurancePolicy $insurancePolicy)
     {
+        Gate::authorize('modify', $insurancePolicy);
+        
         $fields = $request->validate([
             'policy_number' => 'required|max:255',
             'holder_name' => 'required|max:255',
@@ -63,6 +75,8 @@ class InsurancePolicyController extends Controller
      */
     public function destroy(InsurancePolicy $insurancePolicy)
     {
+        Gate::authorize('modify', $insurancePolicy);
+
         $insurancePolicy->delete();
 
         return ['message' => 'The policy was deleted'];

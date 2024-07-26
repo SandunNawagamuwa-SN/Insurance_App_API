@@ -13,12 +13,18 @@ return new class extends Migration
     {
         Schema::create('insurance_policies', function (Blueprint $table) {
             $table->id();
+            // $table->foreignId('user_id')->constrained()->noActionOnUpdate()->nullOnDelete();
+            $table->foreignId('user_id')->unsigned()->nullable();
             $table->string('policy_number');
             $table->string('holder_name');
             $table->string('type_of_insurance');
             $table->decimal('coverage_amount', total: 20, places: 2);
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::table('insurance_policies', function ($table) {
+            $table->foreign('user_id')->references('id')->on('users')->noActionOnUpdate()->nullOnDelete();
         });
     }
 

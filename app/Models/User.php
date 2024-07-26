@@ -46,4 +46,7 @@ class User extends Authenticatable
         ];
     }
 
+    public function insurancePolicies(){
+        return $this->hasMany(InsurancePolicy::class);
+    }
 }
