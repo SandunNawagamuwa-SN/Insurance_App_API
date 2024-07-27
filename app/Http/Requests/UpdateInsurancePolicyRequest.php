@@ -23,8 +23,10 @@ class UpdateInsurancePolicyRequest extends FormRequest
      */
     public function rules(): array
     {
+        $policyId = $this->route('insurancePolicy');
+
         return [
-            'policy_number' => 'required|min:8|max:255|unique:insurance_policies,' . $this->user()->id,
+            'policy_number' => "required|min:8|max:255|unique:insurance_policies,policy_number,$policyId",
             'holder_name' => 'required|min:6|max:255',
             'type_of_insurance' => 'required|max:255',
             'coverage_amount' => 'required|max:255'
@@ -33,7 +35,7 @@ class UpdateInsurancePolicyRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(response()->josn([
+        throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Validation errors',
             'data'    => $validator->errors()

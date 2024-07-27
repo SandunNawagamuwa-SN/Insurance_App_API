@@ -101,7 +101,7 @@ class InsurancePolicyController extends Controller implements HasMiddleware
             $insurancePolicy = $this->insurancePolicyRepositoryInterface->update($updateDetails, $id);
 
             DB::commit();
-            return ApiResponseClass::sendResponse(null,'Insurance Policy Update Successful',201);
+            return ApiResponseClass::sendResponse(new InsurancePolicyResource($insurancePolicy),'Insurance Policy Update Successful',200);
 
        }catch(\Exception $ex){
            return ApiResponseClass::rollback($ex);
@@ -128,6 +128,6 @@ class InsurancePolicyController extends Controller implements HasMiddleware
 
         $this->insurancePolicyRepositoryInterface->delete($insurancePolicy->id);
 
-        return ApiResponseClass::sendResponse(null,'Product Delete Successfully',200);
+        return ApiResponseClass::sendResponse(null,'Insurance Policy Delete Successfully',204);
     }
 }

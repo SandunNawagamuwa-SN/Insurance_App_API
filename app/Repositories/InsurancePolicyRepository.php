@@ -21,7 +21,9 @@ class InsurancePolicyRepository implements InsurancePolicyRepositoryInterface
     }
 
     public function update(array $data, $id){
-        return InsurancePolicy::whereId($id)->update($data);
+        $policy = InsurancePolicy::findOrFail($id);
+        $policy->update($data);
+        return $policy;
     }
 
     public function delete($id){
