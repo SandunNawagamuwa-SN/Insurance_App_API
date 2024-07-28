@@ -99,7 +99,7 @@ class AuthController extends Controller
             throw new HttpResponseException(response()->json([
                 'success'   => false,
                 'message'   => 'Invalid Credentials',
-            ], 200));
+            ], 401));
         }
 
         $user = Auth::user();
