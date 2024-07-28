@@ -9,7 +9,7 @@ use App\Interfaces\InsurancePolicyRepositoryInterface;
 class InsurancePolicyRepository implements InsurancePolicyRepositoryInterface
 {
     public function index(){
-        return InsurancePolicy::paginate(10);
+        return InsurancePolicy::paginate(2);
     }
 
     public function getById($id){
