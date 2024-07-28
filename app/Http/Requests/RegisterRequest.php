@@ -24,7 +24,15 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required|min:8|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed'
+            'password' => 'required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/|confirmed'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'password.confirmed' => 'Mismatch cofirm Password',
+            'password' => 'Minimum length of 8 includes mix of uppercase, lowercase, numbers and symbols. (Not a compromised password)',
         ];
     }
 }
