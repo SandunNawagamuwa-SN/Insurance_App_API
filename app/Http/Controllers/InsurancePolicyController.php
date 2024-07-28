@@ -9,6 +9,7 @@ use App\Http\Resources\InsurancePolicyResource;
 use App\Http\Requests\StoreInsurancePolicyRequest;
 use App\Http\Requests\UpdateInsurancePolicyRequest;
 use App\Interfaces\InsurancePolicyRepositoryInterface;
+use App\Http\Resources\InsurancePolicyCollectionResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -38,8 +39,8 @@ class InsurancePolicyController extends Controller implements HasMiddleware
     {
         // return InsurancePolicy::all();
         $data = $this->insurancePolicyRepositoryInterface->index();
-        
-        return ApiResponseClass::sendResponse(InsurancePolicyResource::collection($data),null,200);
+        // return $data;
+        return ApiResponseClass::sendResponse(new InsurancePolicyCollectionResource($data),null,200);
     }
 
     /**
