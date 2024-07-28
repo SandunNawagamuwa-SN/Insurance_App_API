@@ -87,7 +87,7 @@ class InsurancePolicyController extends Controller implements HasMiddleware
      */
     public function update(UpdateInsurancePolicyRequest $request, $id)
     {
-        Gate::authorize('modify', $this->insurancePolicyRepositoryInterface->getById($id));
+        // Gate::authorize('modify', $this->insurancePolicyRepositoryInterface->getById($id));
 
         $updateDetails = [
             'policy_number' => $request->policy_number,
