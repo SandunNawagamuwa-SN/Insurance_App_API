@@ -19,7 +19,9 @@ class InsurancePolicyResource extends JsonResource
             'policy_number' => $this->policy_number, 
             'holder_name' => $this->holder_name,
             'type_of_insurance' => $this->type_of_insurance,
-            'coverage_amount' => $this->coverage_amount
+            'coverage_amount' => $this->coverage_amount,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }
