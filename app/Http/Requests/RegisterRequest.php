@@ -32,7 +32,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'password.confirmed' => 'Mismatch cofirm Password',
-            'password' => 'Minimum length of 8 includes mix of uppercase, lowercase, numbers and symbols. (Not a compromised password)',
+            'password' => 'Minimum length of 8 includes mix of uppercase, lowercase, numbers and symbols(!$#%). (Not a compromised password)',
         ];
     }
 }
